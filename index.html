@@ -1,0 +1,184 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brain Challenge Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+    }
+    #game-container {
+      display: none;
+      padding: 20px;
+    }
+    #start-screen, #victory-screen {
+      padding: 40px;
+    }
+    .question {
+      font-size: 1.5em;
+      margin: 20px 0;
+    }
+    .option {
+      display: inline-block;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .option:hover {
+      background-color: #d4edda;
+    }
+    .wrong {
+      color: red;
+      font-weight: bold;
+    }
+    .btn {
+      background-color: #007BFF;
+      color: white;
+      padding: 10px 20px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    #music-control {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen">
+    <h1>Brain Challenge</h1>
+    <p>Welcome to the Brain Challenge Game! Are you ready to boost your brain?</p>
+    <input type="text" id="username" placeholder="Enter your name" />
+    <br /><br />
+    <button class="btn" onclick="startGame()">Start</button>
+  </div>  <div id="game-container">
+    <h2 id="level-heading"></h2>
+    <div class="question" id="question"></div>
+    <div id="options"></div>
+    <div id="feedback"></div>
+  </div>  <div id="victory-screen" style="display:none">
+    <h1>Victory!</h1>
+    <p>Congratulations, <span id="winner-name"></span>! You've won the Brain Challenge!</p>
+    <p>Enjoy the flower rain!</p>
+    <button class="btn" onclick="restartGame()">Play Again</button>
+  </div>  <div id="music-control">
+    <button onclick="toggleMusic()">Pause/Play Music</button>
+  </div>  <audio id="bg-music" loop>
+    <source src="music/level1.mp3" type="audio/mp3" />
+  </audio>  <audio id="victory-music">
+    <source src="music/victory.mp3" type="audio/mp3" />
+  </audio>  <script>
+    const levels = [
+      {
+        title: "Puzzle Round",
+        question: "Which shape has four equal sides?",
+        options: ["Circle", "Rectangle", "Square", "Triangle"],
+        answer: "Square",
+        music: "music/level1.mp3"
+      },
+      {
+        title: "Card Round",
+        question: "Which color is traditionally considered lucky?",
+        options: ["Black", "Green", "Red", "Blue"],
+        answer: "Red",
+        music: "music/level2.mp3"
+      },
+      {
+        title: "Math Round",
+        question: "What is 12 × 3?",
+        options: ["36", "30", "24", "48"],
+        answer: "36",
+        music: "music/level3.mp3"
+      },
+      {
+        title: "Algebra Round",
+        question: "If x + 5 = 10, what is x?",
+        options: ["3", "5", "10", "15"],
+        answer: "5",
+        music: "music/level4.mp3"
+      }
+    ];
+
+    let currentLevel = 0;
+    let username = "";
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const feedbackEl = document.getElementById("feedback");
+    const levelHeading = document.getElementById("level-heading");
+    const bgMusic = document.getElementById("bg-music");
+    const victoryMusic = document.getElementById("victory-music");
+
+    function startGame() {
+      username = document.getElementById("username").value || "Player";
+      document.getElementById("start-screen").style.display = "none";
+      document.getElementById("game-container").style.display = "block";
+      loadLevel();
+    }
+
+    function loadLevel() {
+      if (currentLevel >= levels.length) {
+        showVictory();
+        return;
+      }
+      const level = levels[currentLevel];
+      levelHeading.textContent = level.title;
+      questionEl.textContent = level.question;
+      optionsEl.innerHTML = "";
+      feedbackEl.textContent = "";
+      bgMusic.src = level.music;
+      bgMusic.play();
+      level.options.forEach(option => {
+        const btn = document.createElement("div");
+        btn.textContent = option;
+        btn.classList.add("option");
+        btn.onclick = () => checkAnswer(option);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      const correct = levels[currentLevel].answer;
+      if (selected === correct) {
+        currentLevel++;
+        loadLevel();
+      } else {
+        feedbackEl.innerHTML = `<span class='wrong'>Wrong Answer!</span>`;
+      }
+    }
+
+    function showVictory() {
+      document.getElementById("game-container").style.display = "none";
+      document.getElementById("victory-screen").style.display = "block";
+      document.getElementById("winner-name").textContent = username;
+      bgMusic.pause();
+      victoryMusic.play();
+    }
+
+    function restartGame() {
+      currentLevel = 0;
+      document.getElementById("victory-screen").style.display = "none";
+      document.getElementById("start-screen").style.display = "block";
+      victoryMusic.pause();
+    }
+
+    function toggleMusic() {
+      if (bgMusic.paused) {
+        bgMusic.play();
+      } else {
+        bgMusic.pause();
+      }
+    }
+  </script></body>
+</html>
